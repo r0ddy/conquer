@@ -73,12 +73,17 @@ func (re RawEdge) GetValue() (interface{}, error) {
 }
 
 type Graph interface {
+	GetNode(id NodeID) (Node, error)
 	GetNodes() ([]Node, error)
 	GetEdges() ([]Edge, error)
 	GetRaw() RawGraph
 }
 
 type RawGraph struct {
+}
+
+func (rg RawGraph) GetNode(id NodeID) (Node, error) {
+	return nil, nil
 }
 
 func (rg RawGraph) GetNodes() ([]Node, error) {
