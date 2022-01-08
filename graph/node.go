@@ -38,8 +38,8 @@ func (rn rawDirectedNode) GetIncomingEdges() ([]Edge, error) {
 
 func (rn rawDirectedNode) GetOutgoingEdges() ([]Edge, error) {
 	outgoing := make([]Edge, 0)
-	for _, toID := range rn.Incoming {
-		edge, err := rn.RawGraphRef.GetEdge(toID, rn.ID)
+	for _, toID := range rn.Outgoing {
+		edge, err := rn.RawGraphRef.GetEdge(rn.ID, toID)
 		if err != nil {
 			return nil, err
 		}
@@ -57,7 +57,8 @@ func (rn rawDirectedNode) GetIncidentEdges() ([]Edge, error) {
 	if err != nil {
 		return nil, err
 	}
-	return append(incoming, outgoing...), nil
+	incident := append(incoming, outgoing...)
+	return incident, nil
 }
 
 func (rn rawDirectedNode) GetValue() (interface{}, error) {

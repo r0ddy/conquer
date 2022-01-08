@@ -43,11 +43,21 @@ func (rg rawDirectedGraph) GetNodes() ([]Node, error) {
 }
 
 func (rg rawDirectedGraph) GetEdges() ([]Edge, error) {
-	edges := make([]Edge, 0)
+	directedEdges := make([]*rawDirectedEdge, 0)
 	for _, subEdges := range rg.FromToEdges {
 		for _, edge := range subEdges {
-			edges = append(edges, edge)
+			directedEdges = append(directedEdges, edge)
 		}
+	}
+	sort.Slice(directedEdges, func(i, j int) bool {
+		if directedEdges[i].From != directedEdges[j].From {
+			return directedEdges[i].From < directedEdges[j].From
+		}
+		return directedEdges[i].To < directedEdges[j].To
+	})
+	edges := make([]Edge, 0)
+	for _, directedEdge := range directedEdges {
+		edges = append(edges, directedEdge)
 	}
 	return edges, nil
 }
