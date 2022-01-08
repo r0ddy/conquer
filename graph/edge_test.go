@@ -16,7 +16,7 @@ func Test_UndirectedEdge_GetTo(t *testing.T) {
 	edge, err := graph.GetEdge(1, 2)
 	assert.NoError(t, err)
 	_, err = edge.GetTo()
-	assert.ErrorIs(t, err, CannotUseForUndirectedGraphError{"Edge.GetTo"})
+	assert.ErrorIs(t, err, cannotUseForUndirectedGraphError{"Edge.GetTo"})
 }
 
 func Test_DirectedEdge_GetTo(t *testing.T) {
@@ -44,7 +44,7 @@ func Test_UndirectedEdge_GetFrom(t *testing.T) {
 	edge, err := graph.GetEdge(1, 2)
 	assert.NoError(t, err)
 	_, err = edge.GetFrom()
-	assert.ErrorIs(t, err, CannotUseForUndirectedGraphError{"Edge.GetFrom"})
+	assert.ErrorIs(t, err, cannotUseForUndirectedGraphError{"Edge.GetFrom"})
 }
 
 func Test_DirectedEdge_GetFrom(t *testing.T) {
@@ -146,7 +146,7 @@ func Test_UndirectedEdge_GetValue(t *testing.T) {
 	edge, err = graph.GetEdge(1, 3)
 	assert.NoError(t, err)
 	_, err = edge.GetValue()
-	assert.ErrorIs(t, err, NoValueFoundInEdgeError{fromID: 1, toID: 3})
+	assert.ErrorIs(t, err, noValueFoundInEdgeError{fromID: 1, toID: 3})
 }
 
 func Test_DirectedEdge_GetValue(t *testing.T) {
@@ -167,5 +167,5 @@ func Test_DirectedEdge_GetValue(t *testing.T) {
 	edge, err = graph.GetEdge(1, 3)
 	assert.NoError(t, err)
 	_, err = edge.GetValue()
-	assert.ErrorIs(t, err, NoValueFoundInEdgeError{fromID: 1, toID: 3})
+	assert.ErrorIs(t, err, noValueFoundInEdgeError{fromID: 1, toID: 3})
 }

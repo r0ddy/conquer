@@ -232,7 +232,7 @@ func Test_UndirectedWithDuplicateNode(t *testing.T) {
 	gb.AddNode(1)
 	gb.AddNode(1)
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, DuplicateNodeError{nodeID: 1})
+	assert.ErrorIs(t, err, duplicateNodeError{nodeID: 1})
 
 	gb = NewGraphBuilder(BuilderOptions{AllowDuplicateNodes: true})
 	gb.AddNode(1)
@@ -254,7 +254,7 @@ func Test_DirectedWithDuplicateNode(t *testing.T) {
 	gb.AddNode(1)
 	gb.AddNode(1)
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, DuplicateNodeError{nodeID: 1})
+	assert.ErrorIs(t, err, duplicateNodeError{nodeID: 1})
 
 	gb = NewGraphBuilder(BuilderOptions{AllowDuplicateNodes: true, IsDirected: true})
 	gb.AddNode(1)
@@ -277,7 +277,7 @@ func Test_UndirectedWithDuplicateEdge(t *testing.T) {
 	gb.AddEdge(1, 2)
 	gb.AddEdge(1, 2)
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, DuplicateEdgeError{fromID: 1, toID: 2})
+	assert.ErrorIs(t, err, duplicateEdgeError{fromID: 1, toID: 2})
 
 	gb = NewGraphBuilder(BuilderOptions{AllowDuplicateEdges: true})
 	gb.AddNode(1)
@@ -317,7 +317,7 @@ func Test_DirectedWithDuplicateEdge(t *testing.T) {
 	gb.AddEdge(1, 2)
 	gb.AddEdge(1, 2)
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, DuplicateEdgeError{fromID: 1, toID: 2})
+	assert.ErrorIs(t, err, duplicateEdgeError{fromID: 1, toID: 2})
 
 	gb = NewGraphBuilder(BuilderOptions{AllowDuplicateEdges: true, IsDirected: true})
 	gb.AddNode(1)
@@ -349,7 +349,7 @@ func Test_UndirectedWithRedundantEdge(t *testing.T) {
 	gb.AddNode(1)
 	gb.AddEdge(1, 1)
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, RedundantEdgeError{nodeID: 1})
+	assert.ErrorIs(t, err, redundantEdgeError{nodeID: 1})
 
 	gb = NewGraphBuilder(BuilderOptions{AllowRedundantEdges: true})
 	gb.AddNode(1)
@@ -379,7 +379,7 @@ func Test_DirectedWithRedundantEdge(t *testing.T) {
 	gb.AddNode(1)
 	gb.AddEdge(1, 1)
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, RedundantEdgeError{nodeID: 1})
+	assert.ErrorIs(t, err, redundantEdgeError{nodeID: 1})
 
 	gb = NewGraphBuilder(BuilderOptions{AllowRedundantEdges: true, IsDirected: true})
 	gb.AddNode(1)
@@ -406,14 +406,14 @@ func Test_UndirectedWithMultipleValuesForNode(t *testing.T) {
 	gb := NewGraphBuilder()
 	gb.AddNode(1, "value 1", "value 2")
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, MultipleValuesForNodeError{nodeID: 1})
+	assert.ErrorIs(t, err, multipleValuesForNodeError{nodeID: 1})
 }
 
 func Test_DirectedWithMultipleValuesForNode(t *testing.T) {
 	gb := NewGraphBuilder(BuilderOptions{IsDirected: true})
 	gb.AddNode(1, "value 1", "value 2")
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, MultipleValuesForNodeError{nodeID: 1})
+	assert.ErrorIs(t, err, multipleValuesForNodeError{nodeID: 1})
 }
 
 func Test_UndirectedWithMultipleValuesForEdge(t *testing.T) {
@@ -422,7 +422,7 @@ func Test_UndirectedWithMultipleValuesForEdge(t *testing.T) {
 	gb.AddNode(2)
 	gb.AddEdge(1, 2, "value 1", "value 2")
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, MultipleValuesForEdgeError{fromID: 1, toID: 2})
+	assert.ErrorIs(t, err, multipleValuesForEdgeError{fromID: 1, toID: 2})
 }
 
 func Test_DirectedWithMultipleValuesForEdge(t *testing.T) {
@@ -431,5 +431,5 @@ func Test_DirectedWithMultipleValuesForEdge(t *testing.T) {
 	gb.AddNode(2)
 	gb.AddEdge(1, 2, "value 1", "value 2")
 	_, err := gb.Build()
-	assert.ErrorIs(t, err, MultipleValuesForEdgeError{fromID: 1, toID: 2})
+	assert.ErrorIs(t, err, multipleValuesForEdgeError{fromID: 1, toID: 2})
 }

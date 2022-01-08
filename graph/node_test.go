@@ -40,7 +40,7 @@ func Test_UndirectedNode_GetIncomingEdges(t *testing.T) {
 	node, err := graph.GetNode(1)
 	assert.NoError(t, err)
 	_, err = node.GetIncomingEdges()
-	assert.ErrorIs(t, err, CannotUseForUndirectedGraphError{methodName: "Node.GetIncomingEdges"})
+	assert.ErrorIs(t, err, cannotUseForUndirectedGraphError{methodName: "Node.GetIncomingEdges"})
 }
 
 func Test_DirectedNode_GetIncomingEdges(t *testing.T) {
@@ -74,7 +74,7 @@ func Test_UndirectedNode_GetOutgoingEdges(t *testing.T) {
 	node, err := graph.GetNode(1)
 	assert.NoError(t, err)
 	_, err = node.GetOutgoingEdges()
-	assert.ErrorIs(t, err, CannotUseForUndirectedGraphError{methodName: "Node.GetOutgoingEdges"})
+	assert.ErrorIs(t, err, cannotUseForUndirectedGraphError{methodName: "Node.GetOutgoingEdges"})
 }
 
 func Test_DirectedNode_GetOutgoingEdges(t *testing.T) {
@@ -155,7 +155,7 @@ func Test_UndirectedNode_GetValue(t *testing.T) {
 	node, err = graph.GetNode(2)
 	assert.NoError(t, err)
 	_, err = node.GetValue()
-	assert.ErrorIs(t, err, NoValueFoundInNodeError{2})
+	assert.ErrorIs(t, err, noValueFoundInNodeError{2})
 }
 
 func Test_DirectedNode_GetValue(t *testing.T) {
@@ -176,5 +176,5 @@ func Test_DirectedNode_GetValue(t *testing.T) {
 	node, err = graph.GetNode(2)
 	assert.NoError(t, err)
 	_, err = node.GetValue()
-	assert.ErrorIs(t, err, NoValueFoundInNodeError{2})
+	assert.ErrorIs(t, err, noValueFoundInNodeError{2})
 }

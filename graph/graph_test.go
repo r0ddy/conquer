@@ -33,7 +33,7 @@ func Test_UndirectedGraphGetNode(t *testing.T) {
 	AssertNodeEquals(t, expected_node, actual_node)
 
 	_, err = graph.GetNode(5)
-	assert.ErrorIs(t, err, NodeNotFoundError{nodeID: 5})
+	assert.ErrorIs(t, err, nodeNotFoundError{nodeID: 5})
 }
 
 func Test_DirectedGraphGetNode(t *testing.T) {
@@ -53,7 +53,7 @@ func Test_DirectedGraphGetNode(t *testing.T) {
 	AssertNodeEquals(t, expected_node, actual_node)
 
 	_, err = graph.GetNode(5)
-	assert.ErrorIs(t, err, NodeNotFoundError{nodeID: 5})
+	assert.ErrorIs(t, err, nodeNotFoundError{nodeID: 5})
 }
 
 func AssertEdgeEquals(t *testing.T, expected, actual Edge) bool {
@@ -82,7 +82,7 @@ func Test_UndirectedGraphGetEdge(t *testing.T) {
 	AssertEdgeEquals(t, expected_edge, actual_edge)
 
 	_, err = graph.GetEdge(1, 3)
-	assert.ErrorIs(t, err, EdgeNotFoundError{fromID: 1, toID: 3})
+	assert.ErrorIs(t, err, edgeNotFoundError{fromID: 1, toID: 3})
 }
 
 func Test_DirectedGraphGetEdge(t *testing.T) {
@@ -98,7 +98,7 @@ func Test_DirectedGraphGetEdge(t *testing.T) {
 	AssertEdgeEquals(t, expected_edge, actual_edge)
 
 	_, err = graph.GetEdge(2, 1)
-	assert.ErrorIs(t, err, EdgeNotFoundError{fromID: 2, toID: 1})
+	assert.ErrorIs(t, err, edgeNotFoundError{fromID: 2, toID: 1})
 }
 
 func AssertNodesEquals(t *testing.T, expected, actual []Node) bool {

@@ -62,7 +62,7 @@ func (rn rawDirectedNode) GetIncidentEdges() ([]Edge, error) {
 
 func (rn rawDirectedNode) GetValue() (interface{}, error) {
 	if !rn.Value.HasValue {
-		return nil, NoValueFoundInNodeError{rn.ID}
+		return nil, noValueFoundInNodeError{rn.ID}
 	}
 	return rn.Value.RawValue, nil
 }
@@ -84,11 +84,11 @@ func (rn rawUndirectedNode) GetID() NodeID {
 }
 
 func (rn rawUndirectedNode) GetIncomingEdges() ([]Edge, error) {
-	return nil, CannotUseForUndirectedGraphError{"Node.GetIncomingEdges"}
+	return nil, cannotUseForUndirectedGraphError{"Node.GetIncomingEdges"}
 }
 
 func (rn rawUndirectedNode) GetOutgoingEdges() ([]Edge, error) {
-	return nil, CannotUseForUndirectedGraphError{"Node.GetOutgoingEdges"}
+	return nil, cannotUseForUndirectedGraphError{"Node.GetOutgoingEdges"}
 }
 
 func (rn rawUndirectedNode) GetIncidentEdges() ([]Edge, error) {
@@ -105,7 +105,7 @@ func (rn rawUndirectedNode) GetIncidentEdges() ([]Edge, error) {
 
 func (rn rawUndirectedNode) GetValue() (interface{}, error) {
 	if !rn.Value.HasValue {
-		return nil, NoValueFoundInNodeError{rn.ID}
+		return nil, noValueFoundInNodeError{rn.ID}
 	}
 	return rn.Value.RawValue, nil
 }

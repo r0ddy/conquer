@@ -30,13 +30,13 @@ func (builder *RawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
 
 	// check if node exists and that duplicate nodes are not allowed
 	if _, exists := builder.nodes[id]; exists && !builder.builderOptions.AllowDuplicateNodes {
-		builder.err = DuplicateNodeError{nodeID: id}
+		builder.err = duplicateNodeError{nodeID: id}
 		return
 	}
 
 	// check if multiple values are provided
 	if len(value) > 1 {
-		builder.err = MultipleValuesForNodeError{nodeID: id}
+		builder.err = multipleValuesForNodeError{nodeID: id}
 		return
 	}
 
@@ -59,13 +59,13 @@ func (builder *RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...i
 		builder.edges[from] = make(map[NodeID]wrappedValue)
 	}
 	if edgeExists && !builder.builderOptions.AllowDuplicateEdges {
-		builder.err = DuplicateEdgeError{fromID: from, toID: to}
+		builder.err = duplicateEdgeError{fromID: from, toID: to}
 		return
 	}
 
 	// check if multiple values are provided
 	if len(value) > 1 {
-		builder.err = MultipleValuesForEdgeError{fromID: from, toID: to}
+		builder.err = multipleValuesForEdgeError{fromID: from, toID: to}
 		return
 	}
 
@@ -87,17 +87,17 @@ func (builder *RawGraphBuilder) AddEdge(from NodeID, to NodeID, value ...interfa
 	// check if both nodes exist and if build edges incrementally is enabled
 	buildIncrementally := builder.builderOptions.BuildEdgesIncrementally
 	if _, existsFrom := builder.nodes[from]; !existsFrom && buildIncrementally {
-		builder.err = NodeNotFoundError{nodeID: from}
+		builder.err = nodeNotFoundError{nodeID: from}
 		return
 	}
 	if _, existsTo := builder.nodes[to]; !existsTo && buildIncrementally {
-		builder.err = NodeNotFoundError{nodeID: to}
+		builder.err = nodeNotFoundError{nodeID: to}
 		return
 	}
 
 	// check that edge is not redundant
 	if from == to && !builder.builderOptions.AllowRedundantEdges {
-		builder.err = RedundantEdgeError{nodeID: from}
+		builder.err = redundantEdgeError{nodeID: from}
 		return
 	}
 
@@ -133,7 +133,7 @@ func (builder *RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 			if firstNode, firstNodeExists := graph.Nodes[first]; firstNodeExists {
 				firstNode.Neighbors = append(firstNode.Neighbors, second)
 			} else {
-				return nil, &NodeNotFoundError{nodeID: first}
+				return nil, &nodeNotFoundError{nodeID: first}
 			}
 
 			// if first and second are equal to eah other (i.e. self loop) then only add once
@@ -142,7 +142,7 @@ func (builder *RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 					secondNode.Neighbors = append(secondNode.Neighbors, first)
 				}
 			} else {
-				return nil, &NodeNotFoundError{nodeID: second}
+				return nil, &nodeNotFoundError{nodeID: second}
 			}
 
 			// map first, second and second, first to pointer to edge
@@ -204,12 +204,12 @@ func (builder *RawGraphBuilder) buildDirectedGraph() (Graph, error) {
 			if fromNode, fromNodeExists := graph.Nodes[from]; fromNodeExists {
 				fromNode.Outgoing = append(fromNode.Outgoing, to)
 			} else {
-				return nil, &NodeNotFoundError{nodeID: from}
+				return nil, &nodeNotFoundError{nodeID: from}
 			}
 			if toNode, toNodeExists := graph.Nodes[to]; toNodeExists {
 				toNode.Incoming = append(toNode.Incoming, from)
 			} else {
-				return nil, &NodeNotFoundError{nodeID: to}
+				return nil, &nodeNotFoundError{nodeID: to}
 			}
 
 			// map from-to to edge

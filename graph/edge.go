@@ -42,7 +42,7 @@ func (re rawDirectedEdge) GetNodes() ([]Node, error) {
 
 func (re rawDirectedEdge) GetValue() (interface{}, error) {
 	if !re.Value.HasValue {
-		return nil, NoValueFoundInEdgeError{fromID: re.From, toID: re.To}
+		return nil, noValueFoundInEdgeError{fromID: re.From, toID: re.To}
 	}
 	return re.Value.RawValue, nil
 }
@@ -59,11 +59,11 @@ type rawUndirectedEdge struct {
 }
 
 func (re rawUndirectedEdge) GetTo() (Node, error) {
-	return nil, CannotUseForUndirectedGraphError{"Edge.GetTo"}
+	return nil, cannotUseForUndirectedGraphError{"Edge.GetTo"}
 }
 
 func (re rawUndirectedEdge) GetFrom() (Node, error) {
-	return nil, CannotUseForUndirectedGraphError{"Edge.GetFrom"}
+	return nil, cannotUseForUndirectedGraphError{"Edge.GetFrom"}
 }
 
 func (re rawUndirectedEdge) GetNodes() ([]Node, error) {
@@ -85,7 +85,7 @@ func (re rawUndirectedEdge) GetNodes() ([]Node, error) {
 
 func (re rawUndirectedEdge) GetValue() (interface{}, error) {
 	if !re.Value.HasValue {
-		return nil, NoValueFoundInEdgeError{fromID: re.Nodes[0], toID: re.Nodes[1]}
+		return nil, noValueFoundInEdgeError{fromID: re.Nodes[0], toID: re.Nodes[1]}
 	}
 	return re.Value.RawValue, nil
 }

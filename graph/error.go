@@ -2,94 +2,94 @@ package graph
 
 import "fmt"
 
-type DuplicateNodeError struct {
+type duplicateNodeError struct {
 	nodeID NodeID
 }
 
-func (e DuplicateNodeError) Error() string {
+func (e duplicateNodeError) Error() string {
 	return fmt.Sprintf("node with id %d has already been added", e.nodeID)
 }
 
-type DuplicateEdgeError struct {
+type duplicateEdgeError struct {
 	fromID NodeID
 	toID   NodeID
 }
 
-func (e DuplicateEdgeError) Error() string {
+func (e duplicateEdgeError) Error() string {
 	return fmt.Sprintf("edge from %d to %d has already been added", e.fromID, e.toID)
 }
 
-type RedundantEdgeError struct {
+type redundantEdgeError struct {
 	nodeID NodeID
 }
 
-func (e RedundantEdgeError) Error() string {
+func (e redundantEdgeError) Error() string {
 	return fmt.Sprintf("edge from %d to %d is redundant", e.nodeID, e.nodeID)
 }
 
-type NodeNotFoundError struct {
+type nodeNotFoundError struct {
 	nodeID NodeID
 }
 
-func (e NodeNotFoundError) Error() string {
+func (e nodeNotFoundError) Error() string {
 	return fmt.Sprintf("node with id %d could not be found", e.nodeID)
 }
 
-type MultipleValuesForNodeError struct {
+type multipleValuesForNodeError struct {
 	nodeID NodeID
 }
 
-func (e MultipleValuesForNodeError) Error() string {
+func (e multipleValuesForNodeError) Error() string {
 	return fmt.Sprintf("multiple values provided for node with id %d", e.nodeID)
 }
 
-type MultipleValuesForEdgeError struct {
+type multipleValuesForEdgeError struct {
 	fromID NodeID
 	toID   NodeID
 }
 
-func (e MultipleValuesForEdgeError) Error() string {
+func (e multipleValuesForEdgeError) Error() string {
 	return fmt.Sprintf("multiple values provided for edge from %d to %d", e.fromID, e.toID)
 }
 
-type EdgeNotFoundError struct {
+type edgeNotFoundError struct {
 	fromID NodeID
 	toID   NodeID
 }
 
-func (e EdgeNotFoundError) Error() string {
+func (e edgeNotFoundError) Error() string {
 	return fmt.Sprintf("edge from %d to %d could not be found", e.fromID, e.toID)
 }
 
-type NoValueFoundInNodeError struct {
+type noValueFoundInNodeError struct {
 	nodeID NodeID
 }
 
-func (e NoValueFoundInNodeError) Error() string {
+func (e noValueFoundInNodeError) Error() string {
 	return fmt.Sprintf("no value found in node with id %d", e.nodeID)
 }
 
-type NoValueFoundInEdgeError struct {
+type noValueFoundInEdgeError struct {
 	fromID NodeID
 	toID   NodeID
 }
 
-func (e NoValueFoundInEdgeError) Error() string {
+func (e noValueFoundInEdgeError) Error() string {
 	return fmt.Sprintf("no value found in edge from %d to %d", e.fromID, e.toID)
 }
 
-type CannotUseForDirectedGraphError struct {
+type cannotUseForDirectedGraphError struct {
 	methodName string
 }
 
-func (e CannotUseForDirectedGraphError) Error() string {
+func (e cannotUseForDirectedGraphError) Error() string {
 	return fmt.Sprintf("cannot use %s on directed graph", e.methodName)
 }
 
-type CannotUseForUndirectedGraphError struct {
+type cannotUseForUndirectedGraphError struct {
 	methodName string
 }
 
-func (e CannotUseForUndirectedGraphError) Error() string {
+func (e cannotUseForUndirectedGraphError) Error() string {
 	return fmt.Sprintf("cannot use %s on undirected graph", e.methodName)
 }

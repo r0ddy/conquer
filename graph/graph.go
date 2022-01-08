@@ -18,7 +18,7 @@ type rawDirectedGraph struct {
 func (rg rawDirectedGraph) GetNode(id NodeID) (Node, error) {
 	node, exists := rg.Nodes[id]
 	if !exists {
-		return nil, NodeNotFoundError{nodeID: id}
+		return nil, nodeNotFoundError{nodeID: id}
 	}
 	return node, nil
 }
@@ -29,7 +29,7 @@ func (rg rawDirectedGraph) GetEdge(from NodeID, to NodeID) (Edge, error) {
 			return edge, nil
 		}
 	}
-	return nil, EdgeNotFoundError{fromID: from, toID: to}
+	return nil, edgeNotFoundError{fromID: from, toID: to}
 }
 
 func (rg rawDirectedGraph) GetNodes() ([]Node, error) {
@@ -82,7 +82,7 @@ type rawUndirectedGraph struct {
 func (rg rawUndirectedGraph) GetNode(id NodeID) (Node, error) {
 	node, exists := rg.Nodes[id]
 	if !exists {
-		return nil, NodeNotFoundError{nodeID: id}
+		return nil, nodeNotFoundError{nodeID: id}
 	}
 	return node, nil
 }
@@ -93,7 +93,7 @@ func (rg rawUndirectedGraph) GetEdge(first NodeID, second NodeID) (Edge, error) 
 			return edge, nil
 		}
 	}
-	return nil, EdgeNotFoundError{fromID: first, toID: second}
+	return nil, edgeNotFoundError{fromID: first, toID: second}
 }
 
 func (rg rawUndirectedGraph) GetNodes() ([]Node, error) {
