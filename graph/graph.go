@@ -64,9 +64,14 @@ func (rg rawDirectedGraph) Serialize() GraphSerializer {
 	for _, node := range rg.Nodes {
 		gs.Nodes = append(gs.Nodes, node.Serialize())
 	}
+
+	sort.Slice(gs.Nodes, func(i, j int) bool {
+		return gs.Nodes[i].ID < gs.Nodes[j].ID
+	})
+
 	sort.Slice(gs.Edges, func(i, j int) bool {
 		if gs.Edges[i].From != gs.Edges[j].From {
-			return gs.Edges[i].From < gs.Edges[j].To
+			return gs.Edges[i].From < gs.Edges[j].From
 		}
 		return gs.Edges[i].To < gs.Edges[j].To
 	})
@@ -74,7 +79,7 @@ func (rg rawDirectedGraph) Serialize() GraphSerializer {
 	for from, toEdges := range rg.FromToEdges {
 		for to, edge := range toEdges {
 			if _, exists := gs.NodesToEdge[from]; !exists {
-				gs.NodesToEdge[to] = make(map[NodeID]EdgeSerializer)
+				gs.NodesToEdge[from] = make(map[NodeID]EdgeSerializer)
 			}
 			gs.NodesToEdge[from][to] = edge.Serialize()
 		}
