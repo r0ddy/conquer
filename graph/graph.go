@@ -8,6 +8,7 @@ type Graph interface {
 	GetNodes() ([]Node, error)
 	GetEdges() ([]Edge, error)
 	Serialize() GraphSerializer
+	removeRefs() Graph
 }
 
 type rawDirectedGraph struct {
@@ -88,6 +89,18 @@ func (rg rawDirectedGraph) Serialize() GraphSerializer {
 	return gs
 }
 
+func (rg rawDirectedGraph) removeRefs() Graph {
+	for _, edges := range rg.FromToEdges {
+		for _, edge := range edges {
+			edge.RawGraphRef = nil
+		}
+	}
+	for _, node := range rg.Nodes {
+		node.RawGraphRef = nil
+	}
+	return rg
+}
+
 type rawUndirectedGraph struct {
 	Edges      []*rawUndirectedEdge
 	NodesEdges map[NodeID]map[NodeID]*rawUndirectedEdge
@@ -151,6 +164,16 @@ func (rg rawUndirectedGraph) Serialize() GraphSerializer {
 	}
 
 	return gs
+}
+
+func (rg rawUndirectedGraph) removeRefs() Graph {
+	for _, edge := range rg.Edges {
+		edge.RawGraphRef = nil
+	}
+	for _, node := range rg.Nodes {
+		node.RawGraphRef = nil
+	}
+	return rg
 }
 
 type GraphSerializer struct {

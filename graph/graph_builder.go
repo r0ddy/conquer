@@ -1,6 +1,8 @@
 package graph
 
-import "sort"
+import (
+	"sort"
+)
 
 type GraphBuilder interface {
 	AddNode(id NodeID, value ...interface{})
@@ -20,21 +22,21 @@ type RawGraphBuilder struct {
 	err            error
 }
 
-func (rgb RawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
+func (builder *RawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
 	// if there is an existing error skip this command
-	if rgb.err != nil {
+	if builder.err != nil {
 		return
 	}
 
 	// check if node exists and that duplicate nodes are not allowed
-	if _, exists := rgb.nodes[id]; exists && !rgb.builderOptions.AllowDuplicateNodes {
-		rgb.err = DuplicateNodeError{nodeID: id}
+	if _, exists := builder.nodes[id]; exists && !builder.builderOptions.AllowDuplicateNodes {
+		builder.err = DuplicateNodeError{nodeID: id}
 		return
 	}
 
 	// check if multiple values are provided
 	if len(value) > 1 {
-		rgb.err = MultipleValuesForNodeError{nodeID: id}
+		builder.err = MultipleValuesForNodeError{nodeID: id}
 		return
 	}
 
@@ -43,26 +45,28 @@ func (rgb RawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
 		wv.HasValue = true
 		wv.RawValue = value[0]
 	}
-	rgb.nodes[id] = wv
+	builder.nodes[id] = wv
 }
 
-func (rgb RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...interface{}) error {
+func (builder *RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...interface{}) {
 	// check if edge exists and that duplicate edges are not allow
 	edgeExists := false
-	if _, existsFrom := rgb.edges[from]; existsFrom {
-		if _, existsTo := rgb.edges[from][to]; existsTo {
+	if _, existsFrom := builder.edges[from]; existsFrom {
+		if _, existsTo := builder.edges[from][to]; existsTo {
 			edgeExists = true
 		}
 	} else {
-		rgb.edges[from] = make(map[NodeID]wrappedValue)
+		builder.edges[from] = make(map[NodeID]wrappedValue)
 	}
-	if edgeExists && !rgb.builderOptions.AllowDuplicateEdges {
-		return DuplicateEdgeError{fromID: from, toID: to}
+	if edgeExists && !builder.builderOptions.AllowDuplicateEdges {
+		builder.err = DuplicateEdgeError{fromID: from, toID: to}
+		return
 	}
 
 	// check if multiple values are provided
 	if len(value) > 1 {
-		return MultipleValuesForEdgeError{fromID: from, toID: to}
+		builder.err = MultipleValuesForEdgeError{fromID: from, toID: to}
+		return
 	}
 
 	// add edge with from as the first enty and to as the second entry
@@ -71,41 +75,36 @@ func (rgb RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...interf
 		wv.HasValue = true
 		wv.RawValue = value
 	}
-	rgb.edges[from][to] = wv
-	return nil
+	builder.edges[from][to] = wv
 }
 
-func (rgb RawGraphBuilder) AddEdge(from NodeID, to NodeID, value ...interface{}) {
+func (builder *RawGraphBuilder) AddEdge(from NodeID, to NodeID, value ...interface{}) {
 	// if there is an existing error skip this command
-	if rgb.err != nil {
+	if builder.err != nil {
 		return
 	}
 
 	// check if both nodes exist and if build edges incrementally is enabled
-	buildIncrementally := rgb.builderOptions.BuildEdgesIncrementally
-	if _, existsFrom := rgb.nodes[from]; !existsFrom && buildIncrementally {
-		rgb.err = NodeNotFoundError{nodeID: from}
+	buildIncrementally := builder.builderOptions.BuildEdgesIncrementally
+	if _, existsFrom := builder.nodes[from]; !existsFrom && buildIncrementally {
+		builder.err = NodeNotFoundError{nodeID: from}
 		return
 	}
-	if _, existsTo := rgb.nodes[to]; !existsTo && buildIncrementally {
-		rgb.err = NodeNotFoundError{nodeID: to}
+	if _, existsTo := builder.nodes[to]; !existsTo && buildIncrementally {
+		builder.err = NodeNotFoundError{nodeID: to}
 		return
 	}
 
 	// check that edge is not redundant
-	if from == to && !rgb.builderOptions.AllowRedundantEdges {
-		rgb.err = RedundantEdgeError{nodeID: from}
+	if from == to && !builder.builderOptions.AllowRedundantEdges {
+		builder.err = RedundantEdgeError{nodeID: from}
 		return
 	}
 
-	err := rgb.addEdgeHelper(from, to, value...)
-	if err != nil {
-		rgb.err = err
-		return
-	}
+	builder.addEdgeHelper(from, to, value...)
 }
 
-func (builder RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
+func (builder *RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 	graph := rawUndirectedGraph{
 		Edges:      make([]*rawUndirectedEdge, 0),
 		NodesEdges: make(map[NodeID]map[NodeID]*rawUndirectedEdge),
@@ -134,12 +133,12 @@ func (builder RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 			if firstNode, firstNodeExists := graph.Nodes[first]; firstNodeExists {
 				firstNode.Neighbors = append(firstNode.Neighbors, second)
 			} else {
-				return nil, NodeNotFoundError{nodeID: first}
+				return nil, &NodeNotFoundError{nodeID: first}
 			}
 			if secondNode, secondNodeExists := graph.Nodes[second]; secondNodeExists {
 				secondNode.Neighbors = append(secondNode.Neighbors, first)
 			} else {
-				return nil, NodeNotFoundError{nodeID: second}
+				return nil, &NodeNotFoundError{nodeID: second}
 			}
 
 			// map first, second and second, first to pointer to edge
@@ -177,7 +176,7 @@ func (builder RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 	return graph, nil
 }
 
-func (builder RawGraphBuilder) buildDirectedGraph() (Graph, error) {
+func (builder *RawGraphBuilder) buildDirectedGraph() (Graph, error) {
 	graph := rawDirectedGraph{
 		FromToEdges: make(map[NodeID]map[NodeID]*rawDirectedEdge),
 		Nodes:       make(map[NodeID]*rawDirectedNode),
@@ -201,12 +200,12 @@ func (builder RawGraphBuilder) buildDirectedGraph() (Graph, error) {
 			if fromNode, fromNodeExists := graph.Nodes[from]; fromNodeExists {
 				fromNode.Outgoing = append(fromNode.Outgoing, to)
 			} else {
-				return nil, NodeNotFoundError{nodeID: from}
+				return nil, &NodeNotFoundError{nodeID: from}
 			}
 			if toNode, toNodeExists := graph.Nodes[to]; toNodeExists {
 				toNode.Incoming = append(toNode.Incoming, from)
 			} else {
-				return nil, NodeNotFoundError{nodeID: to}
+				return nil, &NodeNotFoundError{nodeID: to}
 			}
 
 			// map from-to to edge
@@ -230,11 +229,14 @@ func (builder RawGraphBuilder) buildDirectedGraph() (Graph, error) {
 	return graph, nil
 }
 
-func (rgb RawGraphBuilder) Build() (Graph, error) {
-	if rgb.builderOptions.IsDirected {
-		return rgb.buildDirectedGraph()
+func (builder *RawGraphBuilder) Build() (Graph, error) {
+	if builder.err != nil {
+		return nil, builder.err
 	}
-	return rgb.buildUndirectedGraph()
+	if builder.builderOptions.IsDirected {
+		return builder.buildDirectedGraph()
+	}
+	return builder.buildUndirectedGraph()
 }
 
 type BuilderOptions struct {
@@ -250,7 +252,7 @@ func NewGraphBuilder(bo ...BuilderOptions) GraphBuilder {
 	if len(bo) == 1 {
 		builderOptions = bo[0]
 	}
-	return RawGraphBuilder{
+	return &RawGraphBuilder{
 		builderOptions: builderOptions,
 		nodes:          make(map[NodeID]wrappedValue),
 		edges:          make(map[NodeID]map[NodeID]wrappedValue),
