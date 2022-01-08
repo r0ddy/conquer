@@ -227,6 +227,28 @@ func Test_DirectedForest(t *testing.T) {
 	AssertGraphEquals(t, expected_graph, actual_graph)
 }
 
+func Test_DuplicateNode(t *testing.T) {
+	gb := NewGraphBuilder(BuilderOptions{AllowDuplicateNodes: false})
+	gb.AddNode(1)
+	gb.AddNode(1)
+	_, err := gb.Build()
+	assert.ErrorIs(t, err, DuplicateNodeError{nodeID: 1})
+
+	gb = NewGraphBuilder(BuilderOptions{AllowDuplicateNodes: true})
+	gb.AddNode(1)
+	gb.AddNode(1)
+	actual_graph, err := gb.Build()
+	assert.NoError(t, err)
+	expected_graph := rawUndirectedGraph{
+		Nodes: map[NodeID]*rawUndirectedNode{
+			1: {ID: 1, Neighbors: []NodeID{}},
+		},
+		Edges:      []*rawUndirectedEdge{},
+		NodesEdges: map[NodeID]map[NodeID]*rawUndirectedEdge{},
+	}
+	AssertGraphEquals(t, expected_graph, actual_graph)
+}
+
 func Test_DuplicateEdge(t *testing.T) {
 	gb := NewGraphBuilder(BuilderOptions{AllowDuplicateEdges: false})
 	gb.AddNode(1)
