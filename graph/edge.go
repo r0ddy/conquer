@@ -3,7 +3,7 @@ package graph
 type Edge interface {
 	GetTo() (Node, error)
 	GetFrom() (Node, error)
-	GetNodes() ([2]Node, error)
+	GetNodes() ([]Node, error)
 	GetValue() (interface{}, error)
 	Serialize() EdgeSerializer
 	removeRef() Edge
@@ -24,8 +24,8 @@ func (re rawDirectedEdge) GetFrom() (Node, error) {
 	return re.RawGraphRef.GetNode(re.From)
 }
 
-func (re rawDirectedEdge) GetNodes() ([2]Node, error) {
-	var nodes [2]Node
+func (re rawDirectedEdge) GetNodes() ([]Node, error) {
+	nodes := make([]Node, 0)
 	from, err := re.GetFrom()
 	if err != nil {
 		return nodes, err
@@ -34,8 +34,10 @@ func (re rawDirectedEdge) GetNodes() ([2]Node, error) {
 	if err != nil {
 		return nodes, err
 	}
-	nodes[0] = from
-	nodes[1] = to
+	nodes = append(nodes, from)
+	if re.From != re.To {
+		nodes = append(nodes, to)
+	}
 	return nodes, nil
 }
 
@@ -77,18 +79,20 @@ func (re rawUndirectedEdge) GetFrom() (Node, error) {
 	return nil, CannotUseForUndirectedGraphError{"Edge.GetFrom"}
 }
 
-func (re rawUndirectedEdge) GetNodes() ([2]Node, error) {
-	var nodes [2]Node
+func (re rawUndirectedEdge) GetNodes() ([]Node, error) {
+	nodes := make([]Node, 0)
 	node, err := re.RawGraphRef.GetNode(re.Nodes[0])
 	if err != nil {
 		return nodes, err
 	}
-	nodes[0] = node
+	nodes = append(nodes, node)
 	node, err = re.RawGraphRef.GetNode(re.Nodes[1])
 	if err != nil {
 		return nodes, err
 	}
-	nodes[1] = node
+	if re.Nodes[0] != re.Nodes[1] {
+		nodes = append(nodes, node)
+	}
 	return nodes, nil
 }
 
