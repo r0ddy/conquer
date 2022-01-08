@@ -94,10 +94,3 @@ func (re rawUndirectedEdge) removeRef() Edge {
 	re.RawGraphRef = nil
 	return re
 }
-
-type EdgeSerializer struct {
-	From  NodeID      `json:"from,omitempty"`
-	To    NodeID      `json:"to,omitempty"`
-	Nodes [2]NodeID   `json:"nodes,omitempty"`
-	Value interface{} `json:"value,omitempty"`
-}

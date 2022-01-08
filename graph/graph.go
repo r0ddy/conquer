@@ -122,9 +122,3 @@ func (rg rawUndirectedGraph) removeRefs() Graph {
 	}
 	return rg
 }
-
-type GraphSerializer struct {
-	Edges       []EdgeSerializer                     `json:"edges,omitempty"`
-	Nodes       []NodeSerializer                     `json:"nodes,omitempty"`
-	NodesToEdge map[NodeID]map[NodeID]EdgeSerializer `json:"nodesToEdge,omitempty"`
-}

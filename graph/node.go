@@ -114,11 +114,3 @@ func (rn rawUndirectedNode) removeRef() Node {
 	rn.RawGraphRef = nil
 	return rn
 }
-
-type NodeSerializer struct {
-	ID        NodeID      `json:"id"`
-	Outgoing  []NodeID    `json:"outgoing,omitempty"`
-	Incoming  []NodeID    `json:"incoming,omitempty"`
-	Neighbors []NodeID    `json:"neighbors,omitempty"`
-	Value     interface{} `json:"value,omitempty"`
-}
