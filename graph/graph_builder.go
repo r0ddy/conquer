@@ -135,8 +135,12 @@ func (builder *RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 			} else {
 				return nil, &NodeNotFoundError{nodeID: first}
 			}
+
+			// if first and second are equal to eah other (i.e. self loop) then only add once
 			if secondNode, secondNodeExists := graph.Nodes[second]; secondNodeExists {
-				secondNode.Neighbors = append(secondNode.Neighbors, first)
+				if first != second {
+					secondNode.Neighbors = append(secondNode.Neighbors, first)
+				}
 			} else {
 				return nil, &NodeNotFoundError{nodeID: second}
 			}
