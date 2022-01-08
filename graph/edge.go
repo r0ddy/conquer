@@ -5,7 +5,6 @@ type Edge interface {
 	GetFrom() (Node, error)
 	GetNodes() ([]Node, error)
 	GetValue() (interface{}, error)
-	Serialize() EdgeSerializer
 	removeRef() Edge
 }
 
@@ -46,18 +45,6 @@ func (re rawDirectedEdge) GetValue() (interface{}, error) {
 		return nil, NoValueFoundInEdgeError{fromID: re.From, toID: re.To}
 	}
 	return re.Value.RawValue, nil
-}
-
-func (re rawDirectedEdge) Serialize() EdgeSerializer {
-	value := re.Value.RawValue
-	if !re.Value.HasValue {
-		value = nil
-	}
-	return EdgeSerializer{
-		From:  re.From,
-		To:    re.To,
-		Value: value,
-	}
 }
 
 func (re rawDirectedEdge) removeRef() Edge {
@@ -101,17 +88,6 @@ func (re rawUndirectedEdge) GetValue() (interface{}, error) {
 		return nil, NoValueFoundInEdgeError{fromID: re.Nodes[0], toID: re.Nodes[1]}
 	}
 	return re.Value.RawValue, nil
-}
-
-func (re rawUndirectedEdge) Serialize() EdgeSerializer {
-	value := re.Value.RawValue
-	if !re.Value.HasValue {
-		value = nil
-	}
-	return EdgeSerializer{
-		Nodes: re.Nodes,
-		Value: value,
-	}
 }
 
 func (re rawUndirectedEdge) removeRef() Edge {

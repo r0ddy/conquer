@@ -8,7 +8,6 @@ type Node interface {
 	GetOutgoingEdges() ([]Edge, error)
 	GetIncidentEdges() ([]Edge, error)
 	GetValue() (interface{}, error)
-	Serialize() NodeSerializer
 	removeRef() Node
 }
 
@@ -68,19 +67,6 @@ func (rn rawDirectedNode) GetValue() (interface{}, error) {
 	return rn.Value.RawValue, nil
 }
 
-func (rn rawDirectedNode) Serialize() NodeSerializer {
-	value := rn.Value.RawValue
-	if !rn.Value.HasValue {
-		value = nil
-	}
-	return NodeSerializer{
-		ID:       rn.GetID(),
-		Outgoing: rn.Outgoing,
-		Incoming: rn.Incoming,
-		Value:    value,
-	}
-}
-
 func (rn rawDirectedNode) removeRef() Node {
 	rn.RawGraphRef = nil
 	return rn
@@ -122,18 +108,6 @@ func (rn rawUndirectedNode) GetValue() (interface{}, error) {
 		return nil, NoValueFoundInNodeError{rn.ID}
 	}
 	return rn.Value.RawValue, nil
-}
-
-func (rn rawUndirectedNode) Serialize() NodeSerializer {
-	value := rn.Value.RawValue
-	if !rn.Value.HasValue {
-		value = nil
-	}
-	return NodeSerializer{
-		ID:        rn.GetID(),
-		Neighbors: rn.Neighbors,
-		Value:     value,
-	}
 }
 
 func (rn rawUndirectedNode) removeRef() Node {
