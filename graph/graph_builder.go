@@ -4,6 +4,7 @@ import (
 	"sort"
 )
 
+// GraphBuilder uses the builder pattern to create directed or undirected graphs.
 type GraphBuilder interface {
 	AddNode(id NodeID, value ...interface{})
 	AddEdge(from NodeID, to NodeID, value ...interface{})
@@ -22,6 +23,10 @@ type RawGraphBuilder struct {
 	err            error
 }
 
+// AddNode adds a node to the current graph current being built.
+// The id parameter is the unique id used to identify this node.
+// The value parameter can optionally be used to store a value in this node.
+// Additionally, AddEdge will connect nodes added via their ids.
 func (builder *RawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
 	// if there is an existing error skip this command
 	if builder.err != nil {
@@ -78,7 +83,11 @@ func (builder *RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...i
 	builder.edges[from][to] = wv
 }
 
-func (builder *RawGraphBuilder) AddEdge(from NodeID, to NodeID, value ...interface{}) {
+// AddEdge adds an edge connecting two nodes.
+// In a directed graph, it uses the fromID parameter and toID parameter to connect an edge from the former to the latter.
+// In an undirected graph, it will create a undirected edge between the two.
+// The value parameter can optionally be used to store a value in this edge.
+func (builder *RawGraphBuilder) AddEdge(fromID NodeID, toID NodeID, value ...interface{}) {
 	// if there is an existing error skip this command
 	if builder.err != nil {
 		return
@@ -86,22 +95,22 @@ func (builder *RawGraphBuilder) AddEdge(from NodeID, to NodeID, value ...interfa
 
 	// check if both nodes exist and if build edges incrementally is enabled
 	buildIncrementally := builder.builderOptions.BuildEdgesIncrementally
-	if _, existsFrom := builder.nodes[from]; !existsFrom && buildIncrementally {
-		builder.err = nodeNotFoundError{nodeID: from}
+	if _, existsFrom := builder.nodes[fromID]; !existsFrom && buildIncrementally {
+		builder.err = nodeNotFoundError{nodeID: fromID}
 		return
 	}
-	if _, existsTo := builder.nodes[to]; !existsTo && buildIncrementally {
-		builder.err = nodeNotFoundError{nodeID: to}
+	if _, existsTo := builder.nodes[toID]; !existsTo && buildIncrementally {
+		builder.err = nodeNotFoundError{nodeID: toID}
 		return
 	}
 
 	// check that edge is not redundant
-	if from == to && !builder.builderOptions.AllowRedundantEdges {
-		builder.err = redundantEdgeError{nodeID: from}
+	if fromID == toID && !builder.builderOptions.AllowRedundantEdges {
+		builder.err = redundantEdgeError{nodeID: fromID}
 		return
 	}
 
-	builder.addEdgeHelper(from, to, value...)
+	builder.addEdgeHelper(fromID, toID, value...)
 }
 
 func (builder *RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
@@ -243,12 +252,26 @@ func (builder *RawGraphBuilder) Build() (Graph, error) {
 	return builder.buildUndirectedGraph()
 }
 
+// BuilderOptions determine what is or isn't allowed in during the construction of a graph.
+// It also specifies whether the graph is directed or undirected.
 type BuilderOptions struct {
-	AllowDuplicateEdges     bool
-	AllowDuplicateNodes     bool
-	AllowRedundantEdges     bool
-	BuildEdgesIncrementally bool // if false will throw NodeNotFound when node has not been added yet
-	IsDirected              bool
+	// AllowDuplicateEdges will allow AddEdge(a, b, val) to be executed multiple times if set to true.
+	// The value of edge a-b can change with each call, but the graph will use the last one.
+	// If false, Build will return a duplicate edge a-b error.
+	AllowDuplicateEdges bool
+	// AllowDuplicateNodes will allow AddNode(id, val) to be executed multiple times if set to true.
+	// The value of the node id can change with each call, but the graph will use the last one.
+	// If false, Build will return a duplicate node id error.
+	AllowDuplicateNodes bool
+	// AllowRedundantEdges will allow AddEdge(a, a, val) to create a self-loop on node a if set to true.
+	// If false, Build will return a redundant edge a-a error.
+	AllowRedundantEdges bool
+	// BuildEdgesIncrementally will allow creation of a graph where AddEdge(a, b, val) occurs before AddNode(a) and/or AddNode(b) if set to true.
+	// If false, Build will return a node a/b not found error
+	BuildEdgesIncrementally bool
+	// IsDirected tells the builder to create a directed graph if set to true.
+	// If false, builder will assume undirected graph.
+	IsDirected bool
 }
 
 func NewGraphBuilder(bo ...BuilderOptions) GraphBuilder {
