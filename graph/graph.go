@@ -38,6 +38,7 @@ func (rg rawDirectedGraph) GetNodes() ([]Node, error) {
 	for _, node := range rg.Nodes {
 		nodes = append(nodes, node)
 	}
+	sort.Slice(nodes, func(i, j int) bool { return nodes[i].GetID() < nodes[j].GetID() })
 	return nodes, nil
 }
 
@@ -129,6 +130,7 @@ func (rg rawUndirectedGraph) GetNodes() ([]Node, error) {
 	for _, node := range rg.Nodes {
 		nodes = append(nodes, node)
 	}
+	sort.Slice(nodes, func(i, j int) bool { return nodes[i].GetID() < nodes[j].GetID() })
 	return nodes, nil
 }
 

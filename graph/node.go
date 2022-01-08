@@ -9,6 +9,7 @@ type Node interface {
 	GetIncidentEdges() ([]Edge, error)
 	GetValue() (interface{}, error)
 	Serialize() NodeSerializer
+	removeRef() Node
 }
 
 type rawDirectedNode struct {
@@ -79,6 +80,11 @@ func (rn rawDirectedNode) Serialize() NodeSerializer {
 	}
 }
 
+func (rn rawDirectedNode) removeRef() Node {
+	rn.RawGraphRef = nil
+	return rn
+}
+
 type rawUndirectedNode struct {
 	ID          NodeID
 	Neighbors   []NodeID
@@ -127,6 +133,11 @@ func (rn rawUndirectedNode) Serialize() NodeSerializer {
 		Neighbors: rn.Neighbors,
 		Value:     value,
 	}
+}
+
+func (rn rawUndirectedNode) removeRef() Node {
+	rn.RawGraphRef = nil
+	return rn
 }
 
 type NodeSerializer struct {

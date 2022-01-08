@@ -73,7 +73,7 @@ func (builder *RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...i
 	wv := wrappedValue{}
 	if len(value) == 1 {
 		wv.HasValue = true
-		wv.RawValue = value
+		wv.RawValue = value[0]
 	}
 	builder.edges[from][to] = wv
 }

@@ -6,6 +6,7 @@ type Edge interface {
 	GetNodes() ([2]Node, error)
 	GetValue() (interface{}, error)
 	Serialize() EdgeSerializer
+	removeRef() Edge
 }
 
 type rawDirectedEdge struct {
@@ -57,6 +58,11 @@ func (re rawDirectedEdge) Serialize() EdgeSerializer {
 	}
 }
 
+func (re rawDirectedEdge) removeRef() Edge {
+	re.RawGraphRef = nil
+	return re
+}
+
 type rawUndirectedEdge struct {
 	Nodes       [2]NodeID
 	RawGraphRef *rawUndirectedGraph
@@ -102,6 +108,11 @@ func (re rawUndirectedEdge) Serialize() EdgeSerializer {
 		Nodes: re.Nodes,
 		Value: value,
 	}
+}
+
+func (re rawUndirectedEdge) removeRef() Edge {
+	re.RawGraphRef = nil
+	return re
 }
 
 type EdgeSerializer struct {
