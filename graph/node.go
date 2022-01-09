@@ -1,5 +1,7 @@
 package graph
 
+import "sort"
+
 type NodeID int
 
 // Node represents a node in a graph with access to its
@@ -133,4 +135,16 @@ func (rn rawUndirectedNode) GetValue() (interface{}, error) {
 func (rn rawUndirectedNode) removeRef() Node {
 	rn.RawGraphRef = nil
 	return rn
+}
+
+func sortNodes(nodes []Node) {
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].GetID() < nodes[j].GetID()
+	})
+}
+
+func sortNodeIDs(nodeIDs []NodeID) {
+	sort.Slice(nodeIDs, func(i, j int) bool {
+		return nodeIDs[i] < nodeIDs[j]
+	})
 }

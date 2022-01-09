@@ -175,7 +175,7 @@ func (builder *rawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 
 	// sort node.neighbors asc
 	for _, node := range graph.Nodes {
-		sort.Slice(node.Neighbors, func(i, j int) bool { return node.Neighbors[i] < node.Neighbors[j] })
+		sortNodeIDs(node.Neighbors)
 	}
 	// sort edge.nodes asc
 	for _, edge := range graph.Edges {
@@ -240,8 +240,8 @@ func (builder *rawGraphBuilder) buildDirectedGraph() (Graph, error) {
 
 	// sort node.outgoing and node.incoming
 	for _, node := range graph.Nodes {
-		sort.Slice(node.Incoming, func(i, j int) bool { return node.Incoming[i] < node.Incoming[j] })
-		sort.Slice(node.Outgoing, func(i, j int) bool { return node.Outgoing[i] < node.Outgoing[j] })
+		sortNodeIDs(node.Incoming)
+		sortNodeIDs(node.Outgoing)
 	}
 	return graph, nil
 }

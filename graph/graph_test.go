@@ -195,3 +195,19 @@ func Test_DirectedGraphGetEdges(t *testing.T) {
 	}
 	AssertEdgesEquals(t, expected_edges, actual_edges)
 }
+
+func Test_UndirectedGraph_IsDirected(t *testing.T) {
+	gb := NewGraphBuilder()
+	gb.AddNode(1)
+	graph, err := gb.Build()
+	assert.NoError(t, err)
+	assert.Equal(t, false, graph.IsDirected())
+}
+
+func Test_DirectedGraph_IsDirected(t *testing.T) {
+	gb := NewGraphBuilder(BuilderOptions{IsDirected: true})
+	gb.AddNode(1)
+	graph, err := gb.Build()
+	assert.NoError(t, err)
+	assert.Equal(t, true, graph.IsDirected())
+}

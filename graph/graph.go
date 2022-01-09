@@ -24,6 +24,9 @@ type Graph interface {
 	// then the edges are sorted by the first entry in that node slice (also ascending).
 	// If those are equal, then they're sorted by the next entry.
 	GetEdges() ([]Edge, error)
+
+	// IsDirected returns true if the graph is directed and false if its undirected.
+	IsDirected() bool
 	removeRefs() Graph
 }
 
@@ -54,7 +57,7 @@ func (rg rawDirectedGraph) GetNodes() ([]Node, error) {
 	for _, node := range rg.Nodes {
 		nodes = append(nodes, node)
 	}
-	sort.Slice(nodes, func(i, j int) bool { return nodes[i].GetID() < nodes[j].GetID() })
+	sortNodes(nodes)
 	return nodes, nil
 }
 
@@ -76,6 +79,10 @@ func (rg rawDirectedGraph) GetEdges() ([]Edge, error) {
 		edges = append(edges, directedEdge)
 	}
 	return edges, nil
+}
+
+func (g rawDirectedGraph) IsDirected() bool {
+	return true
 }
 
 func (rg rawDirectedGraph) removeRefs() Graph {
@@ -118,7 +125,7 @@ func (rg rawUndirectedGraph) GetNodes() ([]Node, error) {
 	for _, node := range rg.Nodes {
 		nodes = append(nodes, node)
 	}
-	sort.Slice(nodes, func(i, j int) bool { return nodes[i].GetID() < nodes[j].GetID() })
+	sortNodes(nodes)
 	return nodes, nil
 }
 
@@ -128,6 +135,10 @@ func (rg rawUndirectedGraph) GetEdges() ([]Edge, error) {
 		edges = append(edges, *edge)
 	}
 	return edges, nil
+}
+
+func (g rawUndirectedGraph) IsDirected() bool {
+	return false
 }
 
 func (rg rawUndirectedGraph) removeRefs() Graph {
