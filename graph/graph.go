@@ -2,10 +2,27 @@ package graph
 
 import "sort"
 
+// Graph represents a directed/undirected graph.
 type Graph interface {
+	// GetNode fetches a node by its id.
+	// If the id does not exist in the graph, it returns a node not found error.
 	GetNode(id NodeID) (Node, error)
+
+	// GetEdge fetches an edge by its two endpoint.
+	// In a directed graph, the from parameter takes the id of where the edge starts
+	// while the to parameter takes the id of where the edge ends.
+	// In an undirected graph, GetEdge(a, b) is equivalent to GetEdge(b, a).
+	// If edge from-to does not exist in the graph, it returns an edge not found error.
 	GetEdge(from NodeID, to NodeID) (Edge, error)
+
+	// GetNodes fetches all the unique nodes of this graph sorted by id (asecnding).
 	GetNodes() ([]Node, error)
+
+	// GetEdges fetches all the unique edges of this graph.
+	// In a directed graph, the edges are sorted by from NodeID then to NodeID (ascending).
+	// In a undirected graph, the nodes in an edge are sorted by id (ascending) and
+	// then the edges are sorted by the first entry in that node slice (also ascending).
+	// If those are equal, then they're sorted by the next entry.
 	GetEdges() ([]Edge, error)
 	removeRefs() Graph
 }

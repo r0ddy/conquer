@@ -6,7 +6,16 @@ import (
 
 // GraphBuilder uses the builder pattern to create directed or undirected graphs.
 type GraphBuilder interface {
+	// AddNode adds a node to the current graph current being built.
+	// The id parameter is the unique id used to identify this node.
+	// The value parameter can optionally be used to store a value in this node.
+	// Additionally, AddEdge will connect nodes added via their ids.
 	AddNode(id NodeID, value ...interface{})
+
+	// AddEdge adds an edge connecting two nodes.
+	// In a directed graph, it uses the fromID parameter and toID parameter to connect an edge from the former to the latter.
+	// In an undirected graph, it will create a undirected edge between the two.
+	// The value parameter can optionally be used to store a value in this edge.
 	AddEdge(from NodeID, to NodeID, value ...interface{})
 	Build() (Graph, error)
 }
@@ -23,10 +32,6 @@ type RawGraphBuilder struct {
 	err            error
 }
 
-// AddNode adds a node to the current graph current being built.
-// The id parameter is the unique id used to identify this node.
-// The value parameter can optionally be used to store a value in this node.
-// Additionally, AddEdge will connect nodes added via their ids.
 func (builder *RawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
 	// if there is an existing error skip this command
 	if builder.err != nil {
@@ -83,10 +88,6 @@ func (builder *RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...i
 	builder.edges[from][to] = wv
 }
 
-// AddEdge adds an edge connecting two nodes.
-// In a directed graph, it uses the fromID parameter and toID parameter to connect an edge from the former to the latter.
-// In an undirected graph, it will create a undirected edge between the two.
-// The value parameter can optionally be used to store a value in this edge.
 func (builder *RawGraphBuilder) AddEdge(fromID NodeID, toID NodeID, value ...interface{}) {
 	// if there is an existing error skip this command
 	if builder.err != nil {
