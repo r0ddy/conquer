@@ -1,9 +1,23 @@
 package graph
 
+// Edge represents an edge in a graph with access to its node endpoints.
+// If its in a directed graph, it also has access to the node the edge comes from
+// and the node the edge goes into. It can also store a value.
 type Edge interface {
+	// GetTo returns the node the edge goes into in a directed graph.
+	// In a undirected graph, this returns a "cannot use this method" error.
 	GetTo() (Node, error)
+
+	// GetFrom returns the node the edge comes from in a directed graph.
+	// In a undirected graph, this returns a "cannot use this method" error.
 	GetFrom() (Node, error)
+
+	// GetNodes returns the endpoint nodes of this edge.
+	// Nodes are sorted by id (ascending).
 	GetNodes() ([]Node, error)
+
+	// GetValue returns the value stored in this edge.
+	// If there is no value then this returns a "no value" error.
 	GetValue() (interface{}, error)
 	removeRef() Edge
 }

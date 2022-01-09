@@ -3,20 +3,20 @@ package graph
 type NodeID int
 
 // Node represents a node in a graph with access to its
-// incident edges. If its a directed graph, it also has access
-// to its incoming/outgoing edges. It can store a value.
+// incident edges. If its in a directed graph, it also has access
+// to its incoming/outgoing edges. It can also store a value.
 type Node interface {
 	// GetID returns the node's unique identifier.
 	GetID() NodeID
 
 	// GetIncomingEdges returns the edges that are pointing to this node in a directed graph.
 	// The edges are sorted by NodeID on the other side of the incoming edge (ascending).
-	// In an undirected graph, this returns a "cannot use this method" error.
+	// In a undirected graph, this returns a "cannot use this method" error.
 	GetIncomingEdges() ([]Edge, error)
 
 	// GetOutgoingEdges returns the edges that are stemming from this node in a directed graph.
 	// The edges are sorted by NodeID on the other side of the outgoing edge (ascending).
-	// In an undirected graph, this returns a "cannot use this method" error
+	// In a undirected graph, this returns a "cannot use this method" error
 	GetOutgoingEdges() ([]Edge, error)
 
 	// GetIncidentEdges returns all the edges that this node is an endpoint of (directed or undirected).
