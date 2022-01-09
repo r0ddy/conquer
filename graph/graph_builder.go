@@ -17,6 +17,9 @@ type GraphBuilder interface {
 	// In an undirected graph, it will create a undirected edge between the two.
 	// The value parameter can optionally be used to store a value in this edge.
 	AddEdge(from NodeID, to NodeID, value ...interface{})
+
+	// Build creates a directed/indirect graph using the ndoes and edges created above.
+	// Returns an error if any of the aforementioned errors is detected.
 	Build() (Graph, error)
 }
 
@@ -25,14 +28,14 @@ type wrappedValue struct {
 	RawValue interface{}
 }
 
-type RawGraphBuilder struct {
+type rawGraphBuilder struct {
 	builderOptions BuilderOptions
 	nodes          map[NodeID]wrappedValue
 	edges          map[NodeID]map[NodeID]wrappedValue
 	err            error
 }
 
-func (builder *RawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
+func (builder *rawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
 	// if there is an existing error skip this command
 	if builder.err != nil {
 		return
@@ -58,7 +61,7 @@ func (builder *RawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
 	builder.nodes[id] = wv
 }
 
-func (builder *RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...interface{}) {
+func (builder *rawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...interface{}) {
 	// check if edge exists and that duplicate edges are not allow
 	edgeExists := false
 	if _, existsFrom := builder.edges[from]; existsFrom {
@@ -88,7 +91,7 @@ func (builder *RawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...i
 	builder.edges[from][to] = wv
 }
 
-func (builder *RawGraphBuilder) AddEdge(fromID NodeID, toID NodeID, value ...interface{}) {
+func (builder *rawGraphBuilder) AddEdge(fromID NodeID, toID NodeID, value ...interface{}) {
 	// if there is an existing error skip this command
 	if builder.err != nil {
 		return
@@ -114,7 +117,7 @@ func (builder *RawGraphBuilder) AddEdge(fromID NodeID, toID NodeID, value ...int
 	builder.addEdgeHelper(fromID, toID, value...)
 }
 
-func (builder *RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
+func (builder *rawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 	graph := rawUndirectedGraph{
 		Edges:      make([]*rawUndirectedEdge, 0),
 		NodesEdges: make(map[NodeID]map[NodeID]*rawUndirectedEdge),
@@ -190,7 +193,7 @@ func (builder *RawGraphBuilder) buildUndirectedGraph() (Graph, error) {
 	return graph, nil
 }
 
-func (builder *RawGraphBuilder) buildDirectedGraph() (Graph, error) {
+func (builder *rawGraphBuilder) buildDirectedGraph() (Graph, error) {
 	graph := rawDirectedGraph{
 		FromToEdges: make(map[NodeID]map[NodeID]*rawDirectedEdge),
 		Nodes:       make(map[NodeID]*rawDirectedNode),
@@ -243,7 +246,7 @@ func (builder *RawGraphBuilder) buildDirectedGraph() (Graph, error) {
 	return graph, nil
 }
 
-func (builder *RawGraphBuilder) Build() (Graph, error) {
+func (builder *rawGraphBuilder) Build() (Graph, error) {
 	if builder.err != nil {
 		return nil, builder.err
 	}
@@ -280,7 +283,7 @@ func NewGraphBuilder(bo ...BuilderOptions) GraphBuilder {
 	if len(bo) == 1 {
 		builderOptions = bo[0]
 	}
-	return &RawGraphBuilder{
+	return &rawGraphBuilder{
 		builderOptions: builderOptions,
 		nodes:          make(map[NodeID]wrappedValue),
 		edges:          make(map[NodeID]map[NodeID]wrappedValue),

@@ -2,11 +2,31 @@ package graph
 
 type NodeID int
 
+// Node represents a node in a graph with access to its
+// incident edges. If its a directed graph, it also has access
+// to its incoming/outgoing edges. It can store a value.
 type Node interface {
+	// GetID returns the node's unique identifier.
 	GetID() NodeID
+
+	// GetIncomingEdges returns the edges that are pointing to this node in a directed graph.
+	// The edges are sorted by NodeID on the other side of the incoming edge (ascending).
+	// In an undirected graph, this returns a "cannot use this method" error.
 	GetIncomingEdges() ([]Edge, error)
+
+	// GetOutgoingEdges returns the edges that are stemming from this node in a directed graph.
+	// The edges are sorted by NodeID on the other side of the outgoing edge (ascending).
+	// In an undirected graph, this returns a "cannot use this method" error
 	GetOutgoingEdges() ([]Edge, error)
+
+	// GetIncidentEdges returns all the edges that this node is an endpoint of (directed or undirected).
+	// If the edges are from an undirected graph, the nodes in each edge will be sorted by id (ascending).
+	// Then the edges are sorted by the first entry and the second entry in this NodeID slice (ascending).
+	// If the edges are from a directed graph, the incoming edges are first then the outgoing edges.
 	GetIncidentEdges() ([]Edge, error)
+
+	// GetValue return the value stored in this node.
+	// If there is no value then this returns a "no value" error.
 	GetValue() (interface{}, error)
 	removeRef() Node
 }
