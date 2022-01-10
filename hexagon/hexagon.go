@@ -1,17 +1,19 @@
 package hexagon
 
-type Direction int
+type Direction string
 
 const (
-	NE Direction = iota
-	E
-	SE
-	SW
-	W
-	NW
+	N  Direction = "N"
+	NE           = "NE"
+	E            = "E"
+	SE           = "SE"
+	S            = "S"
+	SW           = "SW"
+	W            = "W"
+	NW           = "NW"
 )
 
-var AllDirections = []Direction{NE, E, SE, SW, W, NW}
+var SideDirections = []Direction{NE, E, SE, SW, W, NW}
 
 func directionToQR(dir Direction) (q, r int, err error) {
 	switch dir {
@@ -59,7 +61,7 @@ func (hex rawHexagon) GetCoordinates() (q, r int) {
 
 func (hex rawHexagon) GetNeighbors() Neighbors {
 	nei := make(map[Direction]Hexagon)
-	for _, dir := range AllDirections {
+	for _, dir := range SideDirections {
 		q_diff, r_diff, err := directionToQR(dir)
 		if err != nil {
 			continue
