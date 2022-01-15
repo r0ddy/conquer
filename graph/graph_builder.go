@@ -62,6 +62,10 @@ func (builder *rawGraphBuilder) AddNode(id NodeID, value ...interface{}) {
 }
 
 func (builder *rawGraphBuilder) addEdgeHelper(from NodeID, to NodeID, value ...interface{}) {
+	// ensures that addEdgeHelper(8, 9) and addEdgeHelper(9, 8) only add one edge
+	if !builder.builderOptions.IsDirected && from > to {
+		from, to = to, from
+	}
 	// check if edge exists and that duplicate edges are not allow
 	edgeExists := false
 	if _, existsFrom := builder.edges[from]; existsFrom {

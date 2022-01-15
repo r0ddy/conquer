@@ -15,6 +15,37 @@ const (
 
 var SideDirections = []Direction{NE, E, SE, SW, W, NW}
 
+var CornerDirections = []Direction{N, NE, SE, S, SW, NW}
+
+type Angle string
+
+const (
+	Down     Angle = "DOWN"
+	Vertical       = "VERTICAL"
+	Up             = "UP"
+)
+
+var Angles = []Angle{Down, Vertical, Up}
+
+func sideToCornersAndAngle(dir Direction) (Direction, Direction, Angle, error) {
+	switch dir {
+	case NE:
+		return N, NE, Down, nil
+	case E:
+		return NE, SE, Vertical, nil
+	case SE:
+		return SE, S, Up, nil
+	case SW:
+		return S, SW, Down, nil
+	case W:
+		return SW, NW, Vertical, nil
+	case NW:
+		return NW, N, Up, nil
+	default:
+		return N, N, Down, NotAValidSideDirection
+	}
+}
+
 func directionToQR(dir Direction) (q, r int, err error) {
 	switch dir {
 	case NE:

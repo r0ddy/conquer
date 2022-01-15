@@ -1,8 +1,11 @@
 package hexagon
 
-import "sort"
+import (
+	"fmt"
+	"sort"
 
-var CornerDirections = []Direction{N, NE, SE, S, SW, NW}
+	"github.com/r0ddy/conquer/graph"
+)
 
 type HexCorner struct {
 	Hex             Hexagon
@@ -13,8 +16,15 @@ type Corner struct {
 	HexCorners []HexCorner
 }
 
+type Side struct {
+	CornerIndices []int
+	Angle         Angle
+}
+
 type CornerGrid struct {
-	Corners []Corner
+	Corners                []Corner
+	HexCornerToCornerIndex map[int]map[int]map[Direction]int
+	Sides                  []Side
 }
 
 type VisitedMap map[int]map[int]map[Direction]bool
@@ -85,7 +95,11 @@ func getNeighboringSideAndCorners(dir Direction) []SideAndCorner {
 }
 
 func GetCornerGrid(hexGrid HexagonGrid) CornerGrid {
-	grid := CornerGrid{Corners: make([]Corner, 0)}
+	grid := CornerGrid{
+		Corners:                make([]Corner, 0),
+		HexCornerToCornerIndex: make(map[int]map[int]map[Direction]int),
+		Sides:                  make([]Side, 0),
+	}
 	visited := make(map[int]map[int]map[Direction]bool)
 	for _, hex := range hexGrid.GetHexagons() {
 		for _, dir := range CornerDirections {
@@ -98,6 +112,55 @@ func GetCornerGrid(hexGrid HexagonGrid) CornerGrid {
 		}
 	}
 	sortCorners(grid.Corners)
+
+	for index, corner := range grid.Corners {
+		for _, hexCorner := range corner.HexCorners {
+			q, r := hexCorner.Hex.GetCoordinates()
+			dir := hexCorner.CornerDirection
+			if _, qExist := grid.HexCornerToCornerIndex[q]; !qExist {
+				grid.HexCornerToCornerIndex[q] = make(map[int]map[Direction]int)
+			}
+			if _, rExist := grid.HexCornerToCornerIndex[q][r]; !rExist {
+				grid.HexCornerToCornerIndex[q][r] = make(map[Direction]int)
+			}
+			grid.HexCornerToCornerIndex[q][r][dir] = index
+		}
+	}
+
+	builder := graph.NewGraphBuilder(graph.BuilderOptions{AllowDuplicateEdges: true})
+	for idx := range grid.Corners {
+		builder.AddNode(graph.NodeID(idx))
+	}
+	for _, hex := range hexGrid.GetHexagons() {
+		q, r := hex.GetCoordinates()
+		for _, sideDir := range SideDirections {
+			dirA, dirB, angle, err := sideToCornersAndAngle(sideDir)
+			if err == nil {
+				cornerA := grid.HexCornerToCornerIndex[q][r][dirA]
+				cornerB := grid.HexCornerToCornerIndex[q][r][dirB]
+				builder.AddEdge(graph.NodeID(cornerA), graph.NodeID(cornerB), angle)
+			}
+		}
+	}
+	graph, err := builder.Build()
+	if err == nil {
+		edges, err := graph.GetEdges()
+		fmt.Printf("%v", edges)
+		if err == nil {
+			for _, edge := range edges {
+				side := Side{CornerIndices: make([]int, 0)}
+				if cornerIndices, err := edge.GetNodes(); err == nil {
+					for _, cornerIndex := range cornerIndices {
+						side.CornerIndices = append(side.CornerIndices, int(cornerIndex.GetID()))
+					}
+				}
+				if angle, err := edge.GetValue(); err == nil {
+					side.Angle = Angle(fmt.Sprintf("%v", angle))
+				}
+				grid.Sides = append(grid.Sides, side)
+			}
+		}
+	}
 	return grid
 }
 
@@ -155,7 +218,11 @@ func sortCorners(corners []Corner) {
 }
 
 func (grid CornerGrid) removeRef() CornerGrid {
-	refLessCorners := CornerGrid{Corners: make([]Corner, 0)}
+	refLessCorners := CornerGrid{
+		Corners:                make([]Corner, 0),
+		HexCornerToCornerIndex: grid.HexCornerToCornerIndex,
+		Sides:                  grid.Sides,
+	}
 	for _, corner := range grid.Corners {
 		refLessCorner := Corner{HexCorners: make([]HexCorner, 0)}
 		for _, hexCorner := range corner.HexCorners {
